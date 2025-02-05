@@ -3,12 +3,13 @@ from langchain_openai import ChatOpenAI
 from browser_use import Agent
 import asyncio
 import os
-os.environ["OPENAI_API_KEY"] = os.getenv('OPENAI_API_KEY')
-os.environ["ANONYMIZED_TELEMETRY"] = "false"
 
 from dotenv import load_dotenv
 dotenv_path = os.path.join(os.path.dirname(__file__), 'secrets.env')
 load_dotenv(dotenv_path)
+
+os.environ["OPENAI_API_KEY"] = os.getenv('OPENAI_API_KEY')
+os.environ["ANONYMIZED_TELEMETRY"] = "false"
 
 # The model will only see the keys (x_name, x_password) but never the actual values
 sensitive_data = {
