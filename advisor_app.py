@@ -63,7 +63,7 @@ def login(username, password):
         st.session_state.advisor_username = username.lower()
         st.session_state.page = "Clients Overview"
         st.success("Logged in successfully!")
-        st.experimental_rerun()  # Redirect immediately after login
+        st.rerun()  # Redirect immediately after login
     else:
         st.error("Invalid username or password")
 
@@ -73,7 +73,7 @@ def logout():
     st.session_state.advisor_username = ''
     st.session_state.page = "Login"
     st.success("Logged out successfully!")
-    st.experimental_rerun()
+    st.rerun()
 
 # Login Page
 def login_page():

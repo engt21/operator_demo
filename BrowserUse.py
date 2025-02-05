@@ -28,7 +28,8 @@ class StreamlitHandler(logging.Handler):
 # Create handler without a placeholder initially
 streamlit_handler = StreamlitHandler(placeholder=None)
 streamlit_handler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter('%(message)s')
 streamlit_handler.setFormatter(formatter)
 
 console_handler = logging.StreamHandler()
@@ -193,6 +194,7 @@ if st.button("Run task"):
         llm=llm,
         sensitive_data=sensitive_data,
         max_failures=10,
+        generate_gif=test_task_key
     )
 
     # Re-add the logging handler (if needed)
