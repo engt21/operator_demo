@@ -97,24 +97,24 @@ Here is the specific test goal and the steps you should take:
 ux_test_buy_enough_task = """
 You are testing a financial advisor order entry system. You are to test the ability to buy shares for a client if they have enough funds.
 - Buy 20 shares of Morgan Stanley for Client B.
-- Ensure that the transaction is successful as they have enough investment balance.
+- Ensure that the transaction is successful as they have enough investment balance. You should capture the exact text of the resulting message.
 """
 
 ux_test_buy_task_not_enough = """
 You are testing a financial advisor order entry system. You are to test the ability to buy shares for a client if they do not have enough funds.
 - Buy 100000 shares of Morgan for Client B. 
-- This should fail as they do not have enough money.
+- This should fail as they do not have enough money. You should capture the exact text of the resulting message.
 """
 
 ux_test_sell_not_enough_task = """
 You are testing a financial advisor order entry system. You are to test the ability to sell shares for a client if they do not have enough shares.
 - Attempt to sell 10 shares of Microsoft for Client A. 
-- This should fail as they do not own any Microsoft shares.
+- This should fail as they do not own any Microsoft shares. You should capture the exact text of the resulting message.
 """
 
 ux_test_sell_task = """
 You are testing a financial advisor order entry system. You are to test the ability to sell shares for a client if they have enough shares. 
-- Sell all of Client C's NVIDIA shares 
+- Sell all of Client C's NVIDIA shares. You should capture the exact text of the resulting message. 
 """
 
 #
@@ -141,17 +141,19 @@ st.title("MS Operator")
 if 'chat_input_value' not in st.session_state:
     st.session_state.chat_input_value = ""
 
-task_mappings = {
-    "Buy shares success": ux_test_buy_enough_task,
-    "Buy shares fail": ux_test_buy_task_not_enough,
-    "Sell shares success": ux_test_sell_task,
-    "Sell shares fail": ux_test_sell_not_enough_task,
-}
+# task_mappings = {
+#     "Buy shares success": ux_test_buy_enough_task,
+#     "Buy shares fail": ux_test_buy_task_not_enough,
+#     "Sell shares success": ux_test_sell_task,
+#     "Sell shares fail": ux_test_sell_not_enough_task,
+# }
+#
+# with st.sidebar:
+#     test_task_key = st.selectbox("Select a test task", list(task_mappings.keys()), placeholder="Choose a task")
+#     test_steps = task_mappings.get(test_task_key)
+#     task = dummy_fa_app_ux_test_framework_task + test_steps
 
-with st.sidebar:
-    test_task_key = st.selectbox("Select a test task", list(task_mappings.keys()), placeholder="Choose a task")
-    test_steps = task_mappings.get(test_task_key)
-    task = dummy_fa_app_ux_test_framework_task + test_steps
+task = st.chat_input("User task:")
 
 #
 # if test_task:
@@ -164,8 +166,8 @@ with st.sidebar:
 log_placeholder = st.empty()
 # (Optional) You can assign this to the handler if needed:
 streamlit_handler.log_placeholder = log_placeholder
+if task:
 
-if st.button("Run task"):
     with st.chat_message("user"):
         st.write(task)
 
@@ -187,6 +189,18 @@ if st.button("Run task"):
         temperature=0.0,
     )
 
+    from browser_use import Controller, ActionResult
+
+    # Initialize the controller
+    controller = Controller()
+
+    @controller.action('Ask user for confirmation whenever you click a button')
+    def ask_human(question: str) -> str:
+        root_logger.info("IN CONTROLLER ASK HUMAN")
+        answer = input(f'\n{question}\nInput: ')
+        root_logger.info(answer)
+        return ActionResult(extracted_content=answer)
+
     # Pass the sensitive data to the agent
     agent = Agent(
         browser_context=context,
@@ -194,7 +208,8 @@ if st.button("Run task"):
         llm=llm,
         sensitive_data=sensitive_data,
         max_failures=10,
-        generate_gif=test_task_key
+        # generate_gif=test_task_key + ".gif",
+        controller=controller,
     )
 
     # Re-add the logging handler (if needed)
